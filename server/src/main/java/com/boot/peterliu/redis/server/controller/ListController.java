@@ -27,8 +27,7 @@ public class ListController {
         BaseResponse<Object> response = new BaseResponse<>(StatusCode.Success);
         try {
             log.info("商户商品信息:{}",product);
-
-
+            response.setData(listService.addProduct(product));
         } catch (Exception e) {
             log.error("List实战-添加-商户商品~发生异常：{}", e.fillInStackTrace());
             response = new BaseResponse<>(StatusCode.Failed.getCode(), e.getMessage());
@@ -37,16 +36,14 @@ public class ListController {
     }
 
     /**
-     * 获取商户商品列表
+     * 获取商户的商品列表
      * @return
      */
     @GetMapping("/get")
-    public BaseResponse get(@RequestParam Integer id){
+    public BaseResponse get(@RequestParam("userId") Integer userId){
         BaseResponse<Object> response = new BaseResponse<>(StatusCode.Success);
         try {
-            log.info("商品信息:{}");
-
-
+            response.setData(listService.getHistoryProduct(userId));
         } catch (Exception e) {
             log.error("List实战-获取-商户商品列表~发生异常：{}", e.fillInStackTrace());
             response = new BaseResponse<>(StatusCode.Failed.getCode(), e.getMessage());
