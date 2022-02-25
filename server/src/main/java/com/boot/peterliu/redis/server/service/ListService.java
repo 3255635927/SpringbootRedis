@@ -1,6 +1,8 @@
 package com.boot.peterliu.redis.server.service;
 
+import com.boot.peterliu.redis.model.entity.Notice;
 import com.boot.peterliu.redis.model.entity.Product;
+import com.boot.peterliu.redis.model.mapper.NoticeMapper;
 import com.boot.peterliu.redis.model.mapper.ProductMapper;
 import com.boot.peterliu.redis.server.constant.Constant;
 import com.boot.peterliu.redis.server.redis.ListRedisService;
@@ -25,6 +27,8 @@ public class ListService {
     private ListRedisService listRedisService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private NoticeMapper noticeMapper;
 
     //添加商户商品
     @Transactional(rollbackFor = Exception.class)//保证数据的一致性
@@ -63,6 +67,26 @@ public class ListService {
         }
         return list;
     }
+
+    //创建通告
+    @Transactional(rollbackFor = Exception.class)
+    public void pushNotice(Notice notice) throws Exception{
+        if(notice!=null){
+            notice.setId(null);
+            noticeMapper.insertSelective(notice);
+            final Integer id=notice.getId();
+            if(id>0){
+                //TODO:塞入List列表中(队列)，准备异步拉取通知到不同的商户邮箱 - applicationEvent$Listener;Rabbitmq;jms
+                ListOperations<String,Notice> listOperations = redisTemplate.opsForList();
+                listOperations.leftPush(Constant.RedisListNoticeKey,notice);
+            }
+        }
+
+    }
+
+
+
+
 
 
 
