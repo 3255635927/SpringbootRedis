@@ -1,9 +1,11 @@
 package com.boot.peterliu.redis.server.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.boot.peterliu.redis.api.response.BaseResponse;
 import com.boot.peterliu.redis.api.response.StatusCode;
 import com.boot.peterliu.redis.model.entity.Product;
 import com.boot.peterliu.redis.server.service.ListService;
+import com.boot.peterliu.redis.server.utils.ValidatorUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -34,6 +36,31 @@ public class ListController {
         }
         return response;
     }
+
+    /**
+     * 也是添加商户商品信息
+     * @param product
+     * @param result
+     * @return
+     */
+    @PostMapping(value = "/put/v2", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public BaseResponse putV2(@RequestBody @Validated Product product, BindingResult result) {
+        //统一校验
+        String checkRes= ValidatorUtil.checkErrors(result);
+        if(StrUtil.isNotBlank(checkRes)){
+            return new BaseResponse(StatusCode.InvalidParams.getCode(),checkRes);
+        }
+        BaseResponse<Object> response = new BaseResponse<>(StatusCode.Success);
+        try {
+            log.info("商户商品信息V2:{}",product);
+
+        } catch (Exception e) {
+            log.error("List实战-添加-商户商品~发生异常：{}", e.fillInStackTrace());
+            response = new BaseResponse<>(StatusCode.Failed.getCode(), e.getMessage());
+        }
+        return response;
+    }
+
 
     /**
      * 获取商户的商品列表
