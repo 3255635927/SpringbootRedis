@@ -9,7 +9,8 @@ public enum StatusCode {
 
     Success(200,"成功"),
     Failed(-1,"失败"),
-    InvalidParams(-1001,"参数非法")
+    InvalidParams(-1001,"参数非法"),
+    EmailAlreadyExists(1002,"用户邮箱已存在")
     ;
     private Integer code;
     private String msg;

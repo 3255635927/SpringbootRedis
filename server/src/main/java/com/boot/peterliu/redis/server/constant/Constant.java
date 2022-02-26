@@ -13,4 +13,6 @@ public class Constant {
     //List数据类型-通告key
     public static final String RedisListNoticeKey="SpringBootRedis:List:Queue:Notice";
 
+    public static final String RedisSetKey="SpringBootRedis:Set:User:Email";
+
 }
