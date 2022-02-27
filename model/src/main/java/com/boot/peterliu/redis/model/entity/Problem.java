@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode // 此注解会生成equals(Object other) 和 hashCode()方法。
 public class Problem implements Serializable{
     private Integer id;
 

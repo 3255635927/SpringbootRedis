@@ -20,4 +20,11 @@ public class ListRedisService {
         listOperations.leftPush(Constant.RedisListPrefix+product.getUserId(),product);
     }
 
+
+
+
+
+
+
 }
+

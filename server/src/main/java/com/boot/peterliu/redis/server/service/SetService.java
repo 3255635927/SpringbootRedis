@@ -1,6 +1,7 @@
 package com.boot.peterliu.redis.server.service;
 
 import com.boot.peterliu.redis.api.response.StatusCode;
+import com.boot.peterliu.redis.model.entity.Problem;
 import com.boot.peterliu.redis.model.entity.User;
 import com.boot.peterliu.redis.model.mapper.UserMapper;
 import com.boot.peterliu.redis.server.constant.Constant;
@@ -25,6 +26,8 @@ public class SetService {
     private UserMapper userMapper;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private ProblemService problemService;
 
     //TODO:用户注册
     @Transactional(rollbackFor = Exception.class)
@@ -78,6 +81,11 @@ public class SetService {
     public Set<String> getEmails()throws Exception{
         SetOperations<String,String> setOperations = redisTemplate.opsForSet();
         return setOperations.members(Constant.RedisSetKey);
+    }
+
+    //TODO:从存在于缓存的问题库中随机弹出一个问题
+    public Problem getRandomProblem() throws Exception{
+       return problemService.getRandomEntity();
     }
 
 

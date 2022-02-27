@@ -26,41 +26,45 @@ public class SetController {
     private SetService setService;
 
     //TODO:提交用户注册信息
-    @PostMapping(value = "/put",consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public BaseResponse put(@RequestBody @Validated User user, BindingResult result){
+    @PostMapping(value = "/put", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public BaseResponse put(@RequestBody @Validated User user, BindingResult result) {
         String checkRes = ValidatorUtil.checkErrors(result);
-        if(StrUtil.isNotBlank(checkRes)){
-            return new BaseResponse(StatusCode.Failed.getCode(),checkRes);
+        if (StrUtil.isNotBlank(checkRes)) {
+            return new BaseResponse(StatusCode.Failed.getCode(), checkRes);
         }
         BaseResponse response = new BaseResponse(StatusCode.Success);
-        try{
-            log.info("用户注册信息:{}",user);
+        try {
+            log.info("用户注册信息:{}", user);
             response.setData(setService.registerUser(user));
-        }catch (Exception e){
-            response=new BaseResponse(StatusCode.Failed.getCode(),e.getMessage());
+        } catch (Exception e) {
+            response = new BaseResponse(StatusCode.Failed.getCode(), e.getMessage());
         }
         return response;
     }
 
     //TODO:取出缓存中集合Set中所有注册用户的信息
     @GetMapping("/get")
-    public BaseResponse get(){
+    public BaseResponse get() {
         BaseResponse<Object> response = new BaseResponse<>(StatusCode.Success);
-        try{
+        try {
             response.setData(setService.getEmails());
-        }catch (Exception e){
-            response=new BaseResponse<>(StatusCode.Failed.getCode(),e.getMessage());
+        } catch (Exception e) {
+            response = new BaseResponse<>(StatusCode.Failed.getCode(), e.getMessage());
         }
         return response;
     }
 
-
-
-
-
-
-
-
+    //TODO:取出随机问题库随机弹出的问题
+    @GetMapping("/problem/random")
+    public BaseResponse getProblem() {
+        BaseResponse response = new BaseResponse<>(StatusCode.Success);
+        try {
+            response.setData(setService.getRandomProblem());
+        } catch (Exception e) {
+            response = new BaseResponse(StatusCode.Failed.getCode(), e.getMessage());
+        }
+        return response;
+    }
 
 
 }
