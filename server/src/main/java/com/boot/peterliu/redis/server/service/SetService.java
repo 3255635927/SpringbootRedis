@@ -88,6 +88,11 @@ public class SetService {
        return problemService.getRandomEntity();
     }
 
+    //TODO:从缓存中随机、乱序地取出固定数量的试题集合
+    public Set<Problem> getRandomQuestions(Integer recordCount){
+        return problemService.getRandomQuestionList(recordCount);
+    }
+
 
 
 

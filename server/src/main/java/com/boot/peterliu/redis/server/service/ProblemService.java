@@ -64,4 +64,18 @@ public class ProblemService {
     }
 
 
+    //TODO:从缓存中随机、乱序地取出固定数量的试题集合
+    public Set<Problem> getRandomQuestionList(Integer recordCount) {
+        Set<Problem> problems = null;//Set集合本身有唯一性的特点
+        try {
+            SetOperations<String, Problem> setOperations = redisTemplate.opsForSet();
+            //distinctRandomMembers这个API作用是每次请求取到固定数量的、乱序的试题集合(区别于randomMemebers)
+            problems=setOperations.distinctRandomMembers(Constant.RedisProblemSetKey,recordCount);
+        } catch (Exception e) {
+            log.error("从缓存中随机、乱序地取出固定数量的试题集合~发生异常:{}", e.getMessage());
+        }
+        return problems;
+    }
+
+
 }

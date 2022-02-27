@@ -54,7 +54,7 @@ public class SetController {
         return response;
     }
 
-    //TODO:取出随机问题库随机弹出的问题
+    //TODO:取出(移除)问题库中随机弹出的问题
     @GetMapping("/problem/random")
     public BaseResponse getProblem() {
         BaseResponse response = new BaseResponse<>(StatusCode.Success);
@@ -65,6 +65,29 @@ public class SetController {
         }
         return response;
     }
+
+    //TODO:（不移除地）随机取问题库中的给定数量(recordCount)的试题列表
+    @GetMapping("/questions/random")
+    public BaseResponse getRandomProblems(@RequestParam Integer recordCount) {
+        if(recordCount<=0){
+            return new BaseResponse(StatusCode.InvalidParams);
+        }
+        BaseResponse response = new BaseResponse<>(StatusCode.Success);
+        try {
+            response.setData(setService.getRandomQuestions(recordCount));
+        } catch (Exception e) {
+            response = new BaseResponse(StatusCode.Failed.getCode(), e.getMessage());
+        }
+        return response;
+    }
+
+
+
+
+
+
+
+
 
 
 }
