@@ -113,8 +113,52 @@ public class RedisTest {
 
         log.info("从集合key2中移除元素e:{} ",setOperations.remove(key2,"e"));
 
+    }
+
+    /**
+     * 测试有序集合SortedSet
+     */
+    @Test
+    public void method4(){
+        log.info("开始有序集合SortedSet测试");
+
+        final String key="SpringBootRedis:SortedSet:1001";
+        redisTemplate.delete(key);
+
+        ZSetOperations<String,String> zSetOperations = redisTemplate.opsForZSet();
+        zSetOperations.add(key,"a",5.0);
+        zSetOperations.add(key,"b",2.0);
+        zSetOperations.add(key,"c",1.0);
+        zSetOperations.add(key,"d",7.0);
+
+        log.info("有序集合SortedSet-成员数:{}",zSetOperations.size(key));
+        log.info("有序集合SortedSet-元素正序排列:{}",zSetOperations.range(key,0L,zSetOperations.size(key)));
+        log.info("有序集合SortedSet-元素倒序排列:{}",zSetOperations.reverseRange(key,0L,zSetOperations.size(key)));
+
+        log.info("有序集合SortedSet-获取成员a得分:{}",zSetOperations.score(key,"a"));
+        log.info("有序集合SortedSet-获取成员b得分:{}",zSetOperations.score(key,"b"));
+
+        log.info("有序集合SortedSet-正序中c的排名第:{}",zSetOperations.rank(key,"c"));
+        log.info("有序集合SortedSet-倒序中c的排名第:{}",zSetOperations.reverseRank(key,"c"));
+
+        zSetOperations.incrementScore(key,"a",10.0);
+        log.info("有序集合SortedSet-元素正序排列:{}",zSetOperations.range(key,0L,zSetOperations.size(key)));
+
+        zSetOperations.remove(key,"c");
+        log.info("有序集合SortedSet-元素正序排列:{}",zSetOperations.range(key,0L,zSetOperations.size(key)));
+
+        log.info("有序集合SortedSet-取出10分以内的元素:{}",zSetOperations.rangeByScore(key,0L,10L));
+
 
     }
+
+
+
+
+
+
+
+
 
 
 
