@@ -20,4 +20,8 @@ public class Constant {
     //问题key
     public static final String RedisProblemSetKey="SpringBootRedis:Set:Problem";
 
+    //有序集合中话费充值记录的key
+    public static final String RedisSortedSetKey1="SpringBootRedis:SortedSet:PhoneFare:key1";
+
+
 }
