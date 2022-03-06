@@ -22,4 +22,5 @@ public interface PhoneFareMapper {
     Set<PhoneFare> sortFareByPhone(@Param("isAsc") Integer isAsc);
 
     List<PhoneFare> getAllSortFares();
+
 }
