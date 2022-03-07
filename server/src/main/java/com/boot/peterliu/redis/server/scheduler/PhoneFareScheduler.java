@@ -30,13 +30,13 @@ public class PhoneFareScheduler {
     private RedisTemplate redisTemplate;
 
     //TODO:每20秒执行一次(实际场景中并没有这么频繁，可以增加时长，如10小时重新写入)
-    @Scheduled(cron = "0/20 * * * * ?")
+//    @Scheduled(cron = "0/20 * * * * ?") //暂时注释掉，需要时开启即可
     public void sortFareScheduler(){
         log.info("话费充值排行~保证mysql数据库与缓存数据的一致性-定时任务");
         this.cacheSortResult();
     }
 
-    @Async("threadPoolTaskExecutor")
+//    @Async("threadPoolTaskExecutor")  //暂时注释掉，需要时开启即可
     protected void cacheSortResult(){
         try{
             ZSetOperations<String, FareDto> zSetOperations = redisTemplate.opsForZSet();

@@ -1,6 +1,7 @@
 package com.boot.peterliu.redis.test;
 
 import com.boot.peterliu.redis.server.MainApplication;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.extern.log4j.Log4j2;
 import org.assertj.core.util.Lists;
@@ -12,7 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.*;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Log4j2
@@ -148,8 +151,39 @@ public class RedisTest {
         log.info("有序集合SortedSet-元素正序排列:{}",zSetOperations.range(key,0L,zSetOperations.size(key)));
 
         log.info("有序集合SortedSet-取出10分以内的元素:{}",zSetOperations.rangeByScore(key,0L,10L));
+    }
 
+    //TODO:测试HASH数据类型的相关API
+    @Test
+    public void method5(){
+        log.info("测试HASH数据类型的相关API~开始");
+        final String key="SpringBootRedis:Hash:Key:V1";
+        redisTemplate.delete(key);
+        //对key，field以及value都声明为字符串
+        HashOperations<String,String,String> hashOperations = redisTemplate.opsForHash();
 
+        hashOperations.put(key,"10010","zhangsan");
+        hashOperations.put(key,"10011","lisi");
+
+        Map<String,String> resMap = Maps.newHashMap();
+        resMap.put("10012","wangwu");
+        resMap.put("10013","zhaoliu");
+        hashOperations.putAll(key,resMap);
+
+        log.info("哈希HASH~获取所有列表元素:{}",hashOperations.entries(key));
+        log.info("哈希HASH~获取field为10011的元素:{}",hashOperations.get(key,"10011"));
+        log.info("哈希HASH~获取所有元素的field列表:{}",hashOperations.keys(key));
+
+        log.info("哈希HASH~判断field为10013的元素是否存在:{}",hashOperations.hasKey(key,"10013"));
+        log.info("哈希HASH~判断field为10014的元素是否存在:{}",hashOperations.hasKey(key,"10014"));
+
+        hashOperations.putIfAbsent(key,"10014","peterliu");
+        log.info("哈希HASH~获取存在的列表元素:{}",hashOperations.entries(key));
+
+        log.info("哈希HASH~删除元素中field为10010和10011的元素:{}",hashOperations.delete(key,"10010","10011"));
+        log.info("哈希HASH~获取存在的列表元素:{}",hashOperations.entries(key));
+
+        log.info("哈希HASH~获取元素个数:{}",hashOperations.size(key));
     }
 
 
@@ -160,9 +194,21 @@ public class RedisTest {
 
 
 
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
