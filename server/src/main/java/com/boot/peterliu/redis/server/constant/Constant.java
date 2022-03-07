@@ -22,6 +22,10 @@ public class Constant {
 
     //有序集合中话费充值记录的key
     public static final String RedisSortedSetKey1="SpringBootRedis:SortedSet:PhoneFare:key1";
-
+    //有序集合中话费充值记录的key~V2
     public static final String RedisSortedSetKey2="SpringBootRedis:SortedSet:PhoneFare:key2";
+
+    //哈希key
+    public static final String RedisHashKey="SpringBootRedis:Hash:SysConfig:key";
+
 }
