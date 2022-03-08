@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @Author: PeterLiu
  * @Date: 2022/3/7 18:02
@@ -32,6 +35,15 @@ public class HashService {
         return config.getId();
     }
 
+    //TODO：取出缓存中的所有数据字典配置列表
+    public Map<String, List<SysConfig>> getAllCacheConfigs(){
+        return hashRedisService.getWholeCacheConfigs();
+    }
+
+    //TODO：取出缓存中的某一类型下的数据列表
+    public List<SysConfig> getDataByType(final String type) throws Exception{
+        return hashRedisService.getCacheConfigsByType(type);
+    }
 
 }
 

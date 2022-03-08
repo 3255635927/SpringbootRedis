@@ -23,15 +23,14 @@ public class HashController {
     @Autowired
     private HashService hashService;
 
-    //TODO:
+    //TODO:存放数据
     @PostMapping(value = "/put", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public BaseResponse putHash(@RequestBody @Validated SysConfig config, BindingResult result) {
+        BaseResponse<SysConfig> response = new BaseResponse<>(StatusCode.Success);
         String errors = ValidatorUtil.checkErrors(result);
         if (StrUtil.isNotBlank(errors)) {
             return new BaseResponse(StatusCode.Failed);
         }
-
-        BaseResponse<SysConfig> response = new BaseResponse<>(StatusCode.Success);
         try {
             hashService.addSysConfig(config);
         } catch (Exception e) {
@@ -40,17 +39,28 @@ public class HashController {
         return response;
     }
 
-    //TODO:
+    //TODO:获取所有数据字典配置列表
     @GetMapping("/get")
     public BaseResponse get() {
-        BaseResponse<SysConfig> response = new BaseResponse<>(StatusCode.Success);
+        BaseResponse<Object> response = new BaseResponse<>(StatusCode.Success);
         try {
-
+            response.setData(hashService.getAllCacheConfigs());
         } catch (Exception e) {
             response = new BaseResponse(StatusCode.Failed.getCode(), e.getMessage());
         }
         return response;
     }
 
+    //TODO:获取某一类型下所有的列表
+    @GetMapping("/get/type")
+    public BaseResponse getByType(String type) {
+        BaseResponse<Object> response = new BaseResponse<>(StatusCode.Success);
+        try {
+            response.setData(hashService.getDataByType(type));
+        } catch (Exception e) {
+            response = new BaseResponse(StatusCode.Failed.getCode(), e.getMessage());
+        }
+        return response;
+    }
 
 }
