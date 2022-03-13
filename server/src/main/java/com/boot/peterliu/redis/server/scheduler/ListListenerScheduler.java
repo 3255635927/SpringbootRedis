@@ -41,7 +41,8 @@ public class ListListenerScheduler {
     private EmailService emailService;
 
     //TODO: 近实时的定时任务检测,下面的意思是：从0秒开始，每隔10秒触发一次
-    @Scheduled(cron = "0/10 * * * * ?")
+//    @Scheduled(cron = "0/10 * * * * ?")
+        @Scheduled(cron = "0/59 * * * * ?")
     public void schedulerListenNotice() {
         log.info("定时任务调度队列监听、检测通告消息，监听list中的数据");
         ListOperations<String, Notice> listOperations = redisTemplate.opsForList();

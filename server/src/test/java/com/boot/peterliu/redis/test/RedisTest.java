@@ -209,8 +209,6 @@ public class RedisTest {
         Thread.sleep(5000L);//执行后后睡眠5秒钟
         log.info("5秒后再取数据:{}", valueOperations.get(key));
     }
-
-
 }
 
 
