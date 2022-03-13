@@ -7,6 +7,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 单独设计一个缓存业务，暂时不与其他业务耦合在一起
  */
@@ -49,6 +51,15 @@ public class StringRedisService {
      */
     public Boolean ifExist(final String key) throws Exception{
         return stringRedisTemplate.hasKey(Constant.RedisStringPrefix+key);
+    }
+
+    /**
+     * 给key设置过期时间
+     * @param key
+     * @param expireTime
+     */
+    public void expire(final String key,final Long expireTime){
+        stringRedisTemplate.expire(key,expireTime, TimeUnit.SECONDS);
     }
 
 }

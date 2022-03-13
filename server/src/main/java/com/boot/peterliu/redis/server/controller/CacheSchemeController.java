@@ -28,7 +28,8 @@ public class CacheSchemeController {
     public BaseResponse get(@RequestParam Integer id) {
         BaseResponse response = new BaseResponse<>(StatusCode.Success);
         try {
-            response.setData(cacheSchemeService.getItem(id));
+//            response.setData(cacheSchemeService.getItem(id));
+            response.setData(cacheSchemeService.getItemV2(id));
         } catch (Exception e) {
             log.info("典型应用场景-缓存穿透-发生异常：{}", e.fillInStackTrace());
             response = new BaseResponse(StatusCode.Failed.getCode(), e.getMessage());
