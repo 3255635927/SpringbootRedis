@@ -107,7 +107,30 @@ public class CacheSchemeService {
     }
 
 
-
+    //TODO:缓存击穿-查询商品
+    public Item testCacheBreakdown(Integer id) throws Exception {
+        Item item = null;
+        if (id != null) {
+            //判断缓存中是否存在这个key
+            if (stringRedisService.ifExist(id.toString())) {
+                String result = stringRedisService.get(id.toString()).toString();
+                if (StrUtil.isNotBlank(result)) {
+                    item = objectMapper.readValue(result, Item.class);
+                }
+            } else {
+                log.info("缓存击穿，从数据库查询: id={}", id);
+//                item = itemMapper.selectByPrimaryKey(id);
+//                if (item != null) {
+//                    stringRedisService.put(id.toString(), objectMapper.writeValueAsString(item));
+//                } else {
+//                    stringRedisService.put(id.toString(), "");
+//                    //给key设置1小时的过期时间
+//                    stringRedisService.expire(id.toString(), 3600L);
+//                }
+            }
+        }
+        return item;
+    }
 
 
 

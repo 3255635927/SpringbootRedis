@@ -47,6 +47,28 @@ public class CacheSchemeController {
         return response;
     }
 
+    //TODO:演示缓存击穿
+    @GetMapping("/breakdown")
+    public BaseResponse getV2(@RequestParam Integer id){
+        BaseResponse response = new BaseResponse(StatusCode.Success);
+        try{
+            response.setData(cacheSchemeService.testCacheBreakdown(id));
+        }catch (Exception e){
+            log.error("演示缓存击穿-出现异常:{}",e.fillInStackTrace());
+            response=new BaseResponse(StatusCode.Failed.getCode(),e.getMessage());
+        }
+        return response;
+    }
+
+
+
+
+
+
+
+
+
+
 }
 
 
