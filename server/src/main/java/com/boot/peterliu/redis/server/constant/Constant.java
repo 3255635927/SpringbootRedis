@@ -28,4 +28,6 @@ public class Constant {
     //哈希key
     public static final String RedisHashKey="SpringBootRedis:Hash:SysConfig:key";
 
+    public static final String RedisCacheBreakdownLockKey="SpringBootRedis:LockKey:";
+
 }

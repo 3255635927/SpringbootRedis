@@ -1,13 +1,19 @@
 package com.boot.peterliu.redis.server.service;
 
+import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.StrUtil;
 import com.boot.peterliu.redis.model.entity.Item;
 import com.boot.peterliu.redis.model.mapper.ItemMapper;
+import com.boot.peterliu.redis.server.constant.Constant;
 import com.boot.peterliu.redis.server.redis.StringRedisService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: PeterLiu
@@ -18,6 +24,8 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class CacheSchemeService {
 
+    private static final Snowflake SNOWFLAKE = new Snowflake(3, 2);
+
     @Autowired
     private ItemMapper itemMapper;
 
@@ -25,6 +33,8 @@ public class CacheSchemeService {
     private StringRedisService stringRedisService;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     //TODO:测试缓存穿透-查询商品
     public Item getItem(Integer id) throws Exception {
@@ -118,25 +128,38 @@ public class CacheSchemeService {
                     item = objectMapper.readValue(result, Item.class);
                 }
             } else {
-                log.info("缓存击穿，从数据库查询: id={}", id);
-//                item = itemMapper.selectByPrimaryKey(id);
-//                if (item != null) {
-//                    stringRedisService.put(id.toString(), objectMapper.writeValueAsString(item));
-//                } else {
-//                    stringRedisService.put(id.toString(), "");
-//                    //给key设置1小时的过期时间
-//                    stringRedisService.expire(id.toString(), 3600L);
-//                }
+                //TODO:分布式锁的实现-同一时刻只能保证拥有该key的一个线程进入执行共享的业务代码。SETNX,EXPIRE,DELETE。利用redis单线程（原子性）
+                //TODO:-IO多路复用(单核CPU,却支持多任务，多用户的使用，频繁切换很快，用户识别不了)
+                String value = SNOWFLAKE.nextIdStr();//note:获取全局的分布式ID
+                ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
+                Boolean lock = valueOperations.setIfAbsent(Constant.RedisCacheBreakdownLockKey, value);//NOTE:利用互斥锁
+                try {
+                    if (lock) {
+                        stringRedisTemplate.expire(Constant.RedisCacheBreakdownLockKey, 10L, TimeUnit.SECONDS);//NOTE:预防死锁
+
+                        log.info("缓存击穿，从数据库查询: id={}", id);
+
+                        item = itemMapper.selectByPrimaryKey(id);
+                        if (item != null) {
+                            stringRedisService.put(id.toString(), objectMapper.writeValueAsString(item));
+                        } else {
+                            stringRedisService.put(id.toString(), "");
+                            //给key设置1小时的过期时间
+                            stringRedisService.expire(id.toString(), 3600L);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    String currValue = valueOperations.get(Constant.RedisCacheBreakdownLockKey);
+                    if (StrUtil.isNotBlank(currValue) && currValue.equals(value)) {
+                        stringRedisTemplate.delete(Constant.RedisCacheBreakdownLockKey);
+                    }
+                }
             }
         }
         return item;
     }
-
-
-
-
-
-
 
 
 }

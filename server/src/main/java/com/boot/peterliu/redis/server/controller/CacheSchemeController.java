@@ -27,7 +27,8 @@ public class CacheSchemeController {
     //TODO:限流组件RateLimiter
     private static final RateLimiter LIMITER=RateLimiter.create(1);//每秒放进一个令牌
 
-    //TODO:测试缓存穿透
+    //TODO:测试缓存穿透:
+    // 缓存穿透是指缓存和数据库中都没有的数据，而用户不断发起请求，如发起为id为“-1”的数据或id为特别大不存在的数据。这时的用户很可能是攻击者，攻击会导致数据库压力过大。
     @GetMapping("/penetrate")
     public BaseResponse get(@RequestParam Integer id) {
         BaseResponse response = new BaseResponse<>(StatusCode.Success);
@@ -47,7 +48,8 @@ public class CacheSchemeController {
         return response;
     }
 
-    //TODO:演示缓存击穿
+    //TODO:演示缓存击穿:
+    // 缓存击穿是指缓存中没有但数据库中有的数据（一般是缓存时间到期），这时由于并发用户特别多，同时读缓存没读到数据，又同时去数据库去取数据，引起数据库压力瞬间增大，造成过大压力
     @GetMapping("/breakdown")
     public BaseResponse getV2(@RequestParam Integer id){
         BaseResponse response = new BaseResponse(StatusCode.Success);
