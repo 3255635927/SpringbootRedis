@@ -116,7 +116,6 @@ public class CacheSchemeService {
         return item;
     }
 
-
     //TODO:缓存击穿-查询商品
     public Item testCacheBreakdown(Integer id) throws Exception {
         Item item = null;
