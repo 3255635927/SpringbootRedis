@@ -40,7 +40,8 @@ public class RedPacketController {
         Map<String, Object> map = Maps.newHashMap();
         try {
             String packetKey = redPacketService.distributeRedPacket(redPacketDto);
-            map.put("redKey",packetKey);
+            map.put("redKey", packetKey);
+            response.setData(map);
         } catch (Exception e) {
             log.error("发红包~业务模块发生异常：{}", e.fillInStackTrace());
             response = new BaseResponse(StatusCode.Failed.getCode(), e.getMessage());
@@ -50,12 +51,21 @@ public class RedPacketController {
 
     //NOTE:抢红包
     @GetMapping("/rob")
-    public BaseResponse robRedPacket(@RequestParam Integer userId, @RequestParam String redId) {
+    public BaseResponse robRedPacket(@RequestParam Integer userId, @RequestParam String redPacketKey) {
+        if (userId < 0 || StrUtil.isBlank(redPacketKey)) {
+            return new BaseResponse(StatusCode.InvalidParams);
+        }
         BaseResponse response = new BaseResponse<>(StatusCode.Success);
         try {
+            Integer packetAmount = redPacketService.robRequest(userId, redPacketKey);
+            if(packetAmount!=null){
+                response.setData(packetAmount);
+            }else{
+                return new BaseResponse(StatusCode.Failed.getCode(),"红包已经被抢完!");
+            }
 
         } catch (Exception e) {
-            log.error("发红包~业务模块发生异常：userId={},redId={}", userId, redId, e.fillInStackTrace());
+            log.error("发红包~业务模块发生异常：userId={},redPacketKey={}", userId, redPacketKey, e.fillInStackTrace());
             response = new BaseResponse(StatusCode.Failed.getCode(), e.getMessage());
         }
         return response;
