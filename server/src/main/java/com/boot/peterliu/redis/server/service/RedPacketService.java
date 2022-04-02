@@ -101,32 +101,45 @@ public class RedPacketService {
     public Integer robRequest(final Integer userId, final String redPacketKey) throws Exception {
         ValueOperations valueOperations = redisTemplate.opsForValue();
         //TODO:判断当前用户是否抢过红包
-        final String robRedPakcetUserKey=redPacketKey+userId+":rob";
-        Object valueInCache = valueOperations.get(robRedPakcetUserKey);
+        final String robRedPacketUserKey = redPacketKey + userId + ":rob";
+        Object valueInCache = valueOperations.get(robRedPacketUserKey);
         //TODO:如果缓存中存在这个用户抢到红包的key，那么直接返回抢到的金额大小
-        if(valueInCache!=null){
+        if (valueInCache != null) {
             return Integer.valueOf(String.valueOf(valueInCache));
         }
         //TODO:点击红包逻辑
         Boolean ifExist = clickRequest(redPacketKey);
         if (ifExist) {
-            //TODO:拆开红包逻辑
-            //TODO:从缓存中弹出一个随机红包金额
-            Object value = redisTemplate.opsForList().rightPop(redPacketKey);
-            if (value != null) {
-                //TODO:红包个数减一
-                final String totalKey = redPacketKey + ":total";
+            //TODO:基于redis实现分布式锁，对高并发情况下的抢红包异常问题进行解决(保证每个人只能抢一个红包，确保人与红包为1:1)
+            final String lockKey = redPacketKey + userId + "-lock";
+            Boolean lock = valueOperations.setIfAbsent(lockKey, redPacketKey);
+            try {
+                if (lock) {
+                    redisTemplate.expire(lockKey,48L,TimeUnit.HOURS);//给分布式锁设置过期时间
 
-                valueOperations.increment(totalKey,-1L);
+                    //TODO:拆开红包逻辑
+                    //TODO:从缓存中弹出一个随机红包金额
+                    Object value = redisTemplate.opsForList().rightPop(redPacketKey);
+                    if (value != null) {
+                        //TODO:红包个数减一
+                        final String totalKey = redPacketKey + ":total";
 
-                //TODO:入库
-                final Integer amount = Integer.valueOf(String.valueOf(value));
-                recordRedPacketRobbed(userId, redPacketKey, amount);
-                log.info("---当前用户抢到的红包:userId={},redPacketKey={},amount={}", userId, redPacketKey, amount);
+                        valueOperations.increment(totalKey, -1L);
 
-                //TODO:将当前用户抢到的红包金额塞入缓存中
-                valueOperations.set(robRedPakcetUserKey,value,24L, TimeUnit.HOURS);//设置24小时后key过期
-                return amount;
+                        //TODO:入库
+                        final Integer amount = Integer.valueOf(String.valueOf(value));
+                        recordRedPacketRobbed(userId, redPacketKey, amount);
+                        log.info("--增加分布式锁--当前用户抢到的红包:userId={},redPacketKey={},amount={}", userId, redPacketKey, amount);
+
+                        //TODO:将当前用户抢到的红包金额塞入缓存中
+                        valueOperations.set(robRedPacketUserKey, value, 24L, TimeUnit.HOURS);//设置24小时后key过期
+                        return amount;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                //TODO:注意：这里是不需要释放锁的。因为红包一发出去，就产生了一个新的key,当红包金额全部抢完，key的生命周期就结束。
             }
         }
         return null;
