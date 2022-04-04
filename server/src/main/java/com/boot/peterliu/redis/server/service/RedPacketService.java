@@ -69,7 +69,6 @@ public class RedPacketService {
 
     /**
      * 将分发的红包数据写入数据库
-     *
      * @param packetDto
      * @param list      每个红包金额组成的list
      * @param packetKey
@@ -147,7 +146,7 @@ public class RedPacketService {
 
     //TODO:判断缓存中系统中的红包个数
     private Boolean clickRequest(final String redPacketKey) {
-        //TODO:通过红包个数key得到缓存中
+        //TODO:通过红包个数key得到缓存中的红包数量
         Object totalNums = redisTemplate.opsForValue().get(redPacketKey + ":total");
         if (totalNums != null && Integer.valueOf(String.valueOf(totalNums)) > 0) {
             return true;
